@@ -1,4 +1,7 @@
 /* scrollbar */
+@import 'simplebar-react/dist/simplebar.min.css';
+
+/* scrollbar */
 
 ::-webkit-scrollbar {
     width: 10px;
