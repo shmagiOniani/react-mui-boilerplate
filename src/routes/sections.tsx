@@ -2,8 +2,7 @@ import { lazy, Suspense } from "react";
 import { Outlet, Navigate, useRoutes } from "react-router-dom";
 
 import DashboardLayout from "../layouts/dashboard";
-// import { laodData } from '../pages/user';
-// import { DataNotFound } from "../components/error";
+import {ProtectedRoute, PublicRoute} from "../components/route-validation";
 
 export const IndexPage = lazy(() => import("../pages/app"));
 export const BlogPage = lazy(() => import("../pages/blog"));
@@ -18,32 +17,24 @@ export default function Router() {
   const routes = useRoutes([
     {
       element: (
-        <DashboardLayout>
-          <Suspense>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <ProtectedRoute>
+          <DashboardLayout>
+            <Suspense>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </ProtectedRoute>
       ),
       children: [
         { element: <IndexPage />, index: true },
-        {
-          path: "user",
-          element: <UserPage />,
-          // loader: async () => {
-          //   const response = await fetch(
-          //     "http://xdata.rs.ge/TaxPayer/RSPublicInfo"
-          //   );
-          //   return response.json();
-          // },
-          // errorElement: <DataNotFound />,
-        },
+        { path: "user", element: <UserPage /> },
         { path: "products", element: <ProductsPage /> },
         { path: "blog", element: <BlogPage /> },
       ],
     },
     {
       path: "login",
-      element: <LoginPage />,
+      element: <PublicRoute><LoginPage /></PublicRoute>,
     },
     {
       path: "404",
@@ -55,18 +46,5 @@ export default function Router() {
     },
   ]);
 
-
-  // const router = createBrowserRouter(
-  //   createRoutesFromElements(
-  //     <Route path="/" element={<IndexPage />}>
-  //       <Route path="dashboard" element={<Dashboard />} />
-  //       {/* ... etc. */}
-  //     </Route>
-  //   )
-  // );
-
   return routes;
 }
-
-
-

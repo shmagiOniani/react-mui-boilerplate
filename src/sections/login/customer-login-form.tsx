@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
@@ -17,7 +17,7 @@ import { palette, primary } from '../../theme/palette';
 
 import Iconify from '../../components/iconify';
 
-function LoginForm() {
+function CustomerLoginForm() {
   const theme = useTheme();
 
   const router = useRouter();
@@ -30,12 +30,13 @@ function LoginForm() {
         color: alpha(theme.palette.grey[600], 0.9),
       },
       top: '15px',
-      left: '57px',
+      left: '38px',
       fontSize: '14px',
     },
     '& .MuiOutlinedInput-root': {
       fontSize: '14px',
       borderRadius: '100px',
+      minWidth: '342px',
 
       '.css-bipf1u-MuiInputBase-input-MuiOutlinedInput-input': {
         padding: '30px 0 9px 10px',
@@ -50,7 +51,7 @@ function LoginForm() {
   };
 
   const validationSchema = Yup.object({
-    organization: Yup.string().required('ორგანიზაცია სავალდებულოა'),
+    otp: Yup.string().required('ორგანიზაცია სავალდებულოა'),
     userName: Yup.string().required('მომხმარებლის ველი სავალდებულოა'),
     password: Yup.string().required('პაროლი სავალდებულოა'),
   });
@@ -60,15 +61,10 @@ function LoginForm() {
   };
 
   return (
-    <Box
-      sx={{
-        p: 5,
-        pt: 1,
-      }}
-    >
+    <Box>
       <Formik
         initialValues={{
-          organization: '',
+          otp: '',
           userName: '',
           password: '',
         }}
@@ -83,14 +79,15 @@ function LoginForm() {
         }}
       >
         {({ isSubmitting, errors, touched, handleChange, handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit}>
             <Stack spacing={3}>
-              <TextField
-                name="organization"
+              <Field
+                name="otp"
                 label="ორგანიზაცია"
+                as={TextField}  
                 onChange={handleChange}
-                error={touched?.organization && Boolean(errors?.organization)}
-                helperText={touched?.organization && errors?.organization}
+                error={touched?.otp && Boolean(errors?.otp)}
+                helperText={touched?.otp && errors?.otp}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -100,9 +97,10 @@ function LoginForm() {
                 }}
                 sx={inputStyles}
               />
-              <TextField
+              <Field
                 name="userName"
                 label="მომხმარებელი"
+                as={TextField}  
                 onChange={handleChange}
                 error={touched?.userName && Boolean(errors?.userName)}
                 helperText={touched?.userName && errors?.userName}
@@ -115,9 +113,10 @@ function LoginForm() {
                 }}
                 sx={inputStyles}
               />
-              <TextField
+              <Field
                 name="password"
                 label="პაროლი"
+                as={TextField}  
                 type={showPassword ? 'text' : 'password'}
                 onChange={handleChange}
                 error={touched?.password && Boolean(errors?.password)}
@@ -165,11 +164,11 @@ function LoginForm() {
             >
               ავტორიზაცია
             </LoadingButton>
-          </form>
+          </Form>
         )}
       </Formik>
     </Box>
   );
 }
 
-export default LoginForm;
+export default CustomerLoginForm;

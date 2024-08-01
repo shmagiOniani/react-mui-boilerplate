@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
@@ -9,21 +9,25 @@ import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import { useRouter } from '../../routes/hooks';
+// import { useRouter } from '../../routes/hooks';
 
 import { palette, primary } from '../../theme/palette';
 
 import Iconify from '../../components/iconify';
+import { registerCust } from '../../api/auth';
+import { IRegisterCustReqDTO } from '../../api/auth/models';
 
 function CustomerRegistrationForm() {
-  const router = useRouter();
+  // const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+
   const inputStyles = {
     '& .MuiOutlinedInput-root': {
       fontSize: '14px',
       borderRadius: '100px',
       minWidth: '342px',
+      maxWidth: '342px',
 
       '.css-bipf1u-MuiInputBase-input-MuiOutlinedInput-input': {
         padding: '30px 0 9px 10px',
@@ -32,10 +36,14 @@ function CustomerRegistrationForm() {
         padding: '30px 0 9px 10px',
       },
     },
+    '& .MuiFormHelperText-root': {
+      maxWidth: '342px',
+      margin: 0,
+    }
   };
 
   const validationSchema = Yup.object({
-    personalId: Yup.string()
+    personalNumber: Yup.string()
       .matches(/^\d+$/, 'პირადი ნომერი უნდა შედგებოდეს მხოლოდ ციფრებისგან')
       .test(
         'len',
@@ -44,27 +52,27 @@ function CustomerRegistrationForm() {
         (val:any) => val && val.length === 11
       )
       .required('პირადი ნომრის ველი სავალდებულოა'),
-    firstName: Yup.string()
+    name: Yup.string()
       .matches(/^[A-Za-z\u10A0-\u10FF]*$/, 'ველი უნდა შეიცავდეს მხოლოდ ტექსტურ სიმბოლოებს')
       .required('სახელის ველი სავალდებულოა'),
-    lastName: Yup.string()
+    surname: Yup.string()
       .matches(/^[A-Za-z\u10A0-\u10FF]*$/, 'ველი უნდა შეიცავდეს მხოლოდ ტექსტურ სიმბოლოებს')
       .required('გვარის ველი სავალდებულოა'),
     email: Yup.string()
       .email('ელ.ფოსტა უნდა იყოს სწორი ფორმატის')
       .required('ელ.ფოსტის ველი სავალდებულოა'),
-    mobile: Yup.string()
+    phoneNumber: Yup.string()
       .matches(/^\d+$/, 'ტელეფონის ნომერი უნდა შედგებოდეს მხოლოდ ციფრებისგან')
       .test(
         'len',
         'გთხოვთ გადაამოწმოთ ტელეფონის ნომრის სისწორე, ფორმატი არასწორია',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (val:any) => val && val.length === 10
+        (val:any) => val && val.length === 9
       )
       .required('ტელეფონის ნომრის ველი სავალდებულოა'),
     password: Yup.string()
       .matches(
-        /^(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/,
+        /^(?=.*[@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/,
         'პაროლი უნდა შეიცავდეს მინიმუმ ერთ დიდ სიმბოლოს, ერთ პატარა სიმბოლოს, ერთ ციფრს და სპეციალურ სიმბოლოს (მაგ. #,%)'
       )
       .test(
@@ -76,76 +84,84 @@ function CustomerRegistrationForm() {
       .required('პაროლი სავალდებულოა'),
   });
 
-  const handleClick = () => {
-    router.push('/');
+  const handleSubmit = (values:IRegisterCustReqDTO, { setSubmitting }: {setSubmitting: (isSubmitting: boolean) => void}) => {
+
+    registerCust(values)
+    .then((res)=> {
+      console.log(res)
+    })
+
+    console.log('values',values);
+    setSubmitting(false)
+    // router.push('/');
   };
 
   return (
     <Box>
       <Formik
         initialValues={{
-          personalId: '',
-          firstName: '',
-          lastName: '',
-          email: '',
-          mobile: '',
-          password: '',
+          email: "",
+          personalNumber: "",
+          name: "",
+          surname: "",
+          phoneNumber: "",
+          password: "",
         }}
         validationSchema={validationSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          console.log(values);
-          setTimeout(() => {
-            handleClick();
-            setSubmitting(false);
-          }, 900);
-        }}
+        onSubmit={handleSubmit}
       >
         {({ isSubmitting, errors, touched, handleChange, handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit}>
             <Stack spacing={3}>
-              <TextField
-                name="personalId"
+              <Field
+                name="personalNumber"
                 label="პირადი ნომერი"
+                as={TextField}
                 onChange={handleChange}
-                error={touched?.personalId && Boolean(errors?.personalId)}
-                helperText={touched?.personalId && errors?.personalId}
+                error={touched?.personalNumber && Boolean(errors?.personalNumber)}
+                helperText={touched?.personalNumber && errors?.personalNumber}
                 sx={inputStyles}
               />
-              <TextField
-                name="firstName"
+              <Field
+                name="name"
                 label="სახელი"
+                as={TextField}
                 onChange={handleChange}
-                error={touched?.firstName && Boolean(errors?.firstName)}
-                helperText={touched?.firstName && errors?.firstName}
+                error={touched?.name && Boolean(errors?.name)}
+                helperText={touched?.name && errors?.name}
                 sx={inputStyles}
               />
-              <TextField
-                name="lastName"
+              <Field
+                name="surname"
                 label="გვარი"
+                as={TextField}
                 onChange={handleChange}
-                error={touched?.lastName && Boolean(errors?.lastName)}
-                helperText={touched?.lastName && errors?.lastName}
+                error={touched?.surname && Boolean(errors?.surname)}
+                helperText={touched?.surname && errors?.surname}
                 sx={inputStyles}
               />
-              <TextField
+              <Field
                 name="email"
                 label="ელ. ფოსტა"
+                as={TextField}
                 onChange={handleChange}
                 error={touched?.email && Boolean(errors?.email)}
                 helperText={touched?.email && errors?.email}
                 sx={inputStyles}
               />
-              <TextField
-                name="mobile"
+              <Field
+                name="phoneNumber"
                 label="ტელ. ნომერი"
+                as={TextField}
                 onChange={handleChange}
-                error={touched?.mobile && Boolean(errors?.mobile)}
-                helperText={touched?.mobile && errors?.mobile}
+                error={touched?.phoneNumber && Boolean(errors?.phoneNumber)}
+                helperText={touched?.phoneNumber && errors?.phoneNumber}
                 sx={inputStyles}
               />{' '}
-              <TextField
+              <Field
                 name="password"
                 label="პაროლი"
+                as={TextField}
                 type={showPassword ? 'text' : 'password'}
                 onChange={handleChange}
                 error={touched?.password && Boolean(errors?.password)}
@@ -182,7 +198,7 @@ function CustomerRegistrationForm() {
             >
               რეგისტრაცია
             </LoadingButton>
-          </form>
+          </Form>
         )}
       </Formik>
     </Box>

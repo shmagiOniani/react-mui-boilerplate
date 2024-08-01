@@ -1,6 +1,6 @@
 // import axios from 'axios';
 import * as Yup from 'yup';
-import { Formik } from 'formik';
+import { Field, Form, Formik } from 'formik';
 import { useState } from 'react';
 
 import Box from '@mui/material/Box';
@@ -13,10 +13,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 
 import { useRouter } from '../../routes/hooks';
 
-// import { organization } from '../..//_mock/user';
 import { palette, primary } from '../../theme/palette';
 
 import Iconify from '../../components/iconify';
+import { organizationData } from '../../_mock/organization-data';
+import { ISetFieldValue } from '../../types/formik';
 
 function OrgRegistrationForm() {
   const router = useRouter();
@@ -35,6 +36,10 @@ function OrgRegistrationForm() {
         padding: '30px 0 9px 10px',
       },
     },
+    '& .MuiFormHelperText-root': {
+      maxWidth: '342px',
+      margin: 0,
+    }
   };
 
   const validationSchema = Yup.object({
@@ -50,7 +55,7 @@ function OrgRegistrationForm() {
 
     password: Yup.string()
       .matches(
-        /^(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/,
+        /^(?=.*[@#$%^&*(),.?":{}|<>])(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/,
         'პაროლი უნდა შეიცავდეს მინიმუმ ერთ დიდ სიმბოლოს, ერთ პატარა სიმბოლოს, ერთ ციფრს და სპეციალურ სიმბოლოს (მაგ. #,%)'
       )
       .test(
@@ -66,35 +71,13 @@ function OrgRegistrationForm() {
     router.push('/');
   };
 
-  // const checkOrganization = (values, setFieldValue) => {
-  //   // axios.post("http://xdata.rs.ge/TaxPayer/RSPublicInfo", {"IdentCode":values.identityCode})
-  //   setTimeout(() => {
-  //     const { FullName } = organization;
-  //     console.log('values', values.identityCode, FullName);
-  //     setFieldValue('organisationName', FullName);
-  //   }, 300);
-  // };
-
-  // {
-  //   "identityCode": "string",
-  //   "organisationName": "string",
-  //   "directorName": "string",
-  //   "directorSurname": "string",
-  //   "address": "string",
-  //   "trustedPersonName": "string",
-  //   "trustedPersonSurname": "string",
-  //   "password": "string",
-  //   "trustedPersonPosition": "string",
-  //   "contactPersonDto": {
-  //     "name": "string",
-  //     "surname": "string",
-  //     "personalNumber": "string",
-  //     "phoneNumber": "string",
-  //     "email": "string",
-  //     "businessArea": "string",
-  //     "businessGeographicLocation": "string"
-  //   }
-  // }
+  const checkOrganization = ( setFieldValue: ISetFieldValue) => {
+    // axios.post("http://xdata.rs.ge/TaxPayer/RSPublicInfo", {"IdentCode":values.identityCode})
+    setTimeout(() => {
+      const { FullName } = organizationData[0];
+      setFieldValue('organisationName', FullName);
+    }, 300);
+  };
 
   return (
     <Box overflow="auto">
@@ -109,6 +92,13 @@ function OrgRegistrationForm() {
           trustedPersonSurname: '',
           trustedPersonPosition: '',
           password: '',
+          personalNumber: '',
+          name: '',
+          surname: '',
+          email: '',
+          phoneNumber: '',
+          businessArea: '',
+          businessGeographicLocation: '',
         }}
         validationSchema={validationSchema}
         onSubmit={(values, { setSubmitting }) => {
@@ -119,13 +109,15 @@ function OrgRegistrationForm() {
           }, 900);
         }}
       >
-        {({ isSubmitting, errors, touched, handleChange, handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+        {({ isSubmitting, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
+          <Form onSubmit={handleSubmit}>
             <Box sx={{ display: 'flex' }}>
               <Stack spacing={3} sx={{ py: 1 }}>
-                <TextField
+                <Field
+                  id="identityCode"
                   name="identityCode"
                   label="საიდენტიფიკაციო კოდი"
+                  as={TextField}
                   onChange={handleChange}
                   error={touched?.identityCode && Boolean(errors?.identityCode)}
                   helperText={touched?.identityCode && errors?.identityCode}
@@ -135,7 +127,7 @@ function OrgRegistrationForm() {
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => {
-                            // checkOrganization(values, setFieldValue)
+                            checkOrganization( setFieldValue)
                             // setValues({ organisationName: 'FullName' });
                           }}
                           edge="end"
@@ -146,53 +138,69 @@ function OrgRegistrationForm() {
                     ),
                   }}
                 />
-                <TextField
+                <Field
+                  id="organisationName"
                   name="organisationName"
                   label="დასახელება"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
-                <TextField
+                <Field
+                  id="directorName"
                   name="directorName"
                   label="დირექტორის სახელი"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
-                <TextField
+                <Field
+                  id="directorSurname"
                   name="directorSurname"
                   label="დირექტორის გვარი"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
-                <TextField
+                <Field
+                  id="address"
                   name="address"
                   label="მისამართი"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
 
-                <TextField
+                <Field
+                  id="trustedPersonName"
                   name="trustedPersonName"
                   label="მინდობილი პირის სახელი"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
-                <TextField
+                <Field
+                  id="trustedPersonSurname"
                   name="trustedPersonSurname"
                   label="მინდობილი პირის გვარი"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
-                <TextField
+                <Field
+                  id="trustedPersonPosition"
                   name="trustedPersonPosition"
                   label="მინდობილი პირის თანამდებობა"
+                  as={TextField}
                   onChange={handleChange}
                   sx={inputStyles}
                 />
 
-                <TextField
+                <Field
+                  id="password"
                   name="password"
                   label="პაროლი"
+                  as={TextField}
                   type={showPassword ? 'text' : 'password'}
                   onChange={handleChange}
                   error={touched?.password && Boolean(errors?.password)}
@@ -213,59 +221,74 @@ function OrgRegistrationForm() {
               <Paper elevation={6} sx={{height: "fit-content", ml: 2, mt:1, p: 1}}>
                 <Typography  variant='body1' sx={{textAlign: "center", my: 1}}>საკონტაქტო პირის ინფორმაცია</Typography>
                 <Stack spacing={3} sx={{ py: 1, pl: 2 }}>
-                  <TextField
+                  <Field
+                    id="personalNumber"
                     name="personalNumber"
                     label="პირადი ნომერი"
+                    as={TextField}
                     onChange={handleChange}
                     // error={touched?.personalId && Boolean(errors?.personalId)}
                     // helperText={touched?.personalId && errors?.personalId}
                     sx={inputStyles}
                   />
-                  <TextField
+                 <Field
+                    id="name"
                     name="name"
                     label="სახელი"
+                    as={TextField}
                     onChange={handleChange}
                     // error={touched?.name && Boolean(errors?.name)}
                     // helperText={touched?.name && errors?.name}
                     sx={inputStyles}
                   />
-                  <TextField
+                  <Field
+                    id="surname"
                     name="surname"
                     label="გვარი"
+                    as={TextField}
                     onChange={handleChange}
                     // error={touched?.surname && Boolean(errors?.surname)}
                     // helperText={touched?.surname && errors?.surname}
                     sx={inputStyles}
                   />
-                  <TextField
+                  <Field
+                    id="email"
                     name="email"
-                    label="ელ. ფოსტა"
+                    label="ელ.ფოსტა"
+                    autoComplete='off'
+                    as={TextField}
                     onChange={handleChange}
                     // error={touched?.email && Boolean(errors?.email)}
                     // helperText={touched?.email && errors?.email}
                     sx={inputStyles}
                   />
-                  <TextField
+                  <Field
+                    id="phoneNumber"
                     name="phoneNumber"
                     label="ტელ. ნომერი"
+                    as={TextField}
                     onChange={handleChange}
                     // error={touched?.phoneNumber && Boolean(errors?.phoneNumber)}
                     // helperText={touched?.phoneNumber && errors?.phoneNumber}
                     sx={inputStyles}
                   />
-                  <TextField
+                  <Field
+                    id="businessArea"
                     name="businessArea"
                     label="საქმიანობის სფერო"
+                    as={TextField}
                     onChange={handleChange}
                     sx={inputStyles}
                   />
-                  <TextField
+                  <Field
+                    id="businessGeographicLocation"
                     name="businessGeographicLocation"
                     label="საქმიანობის გეოგრაფიული არეალი"
+                    as={TextField}
                     onChange={handleChange}
                     sx={inputStyles}
                   />
-                </Stack>
+                </Stack> 
               </Paper>
             </Box>
 
@@ -288,7 +311,7 @@ function OrgRegistrationForm() {
             >
               რეგისტრაცია
             </LoadingButton>
-          </form>
+          </Form>
         )}
       </Formik>
     </Box>
